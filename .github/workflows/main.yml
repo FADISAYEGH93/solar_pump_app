@@ -1,4 +1,4 @@
-name: Build Flutter APK
+name: Build Flutter APK Final
 
 on:
   push:
@@ -24,17 +24,33 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Automatic Application Assembly
+    - name: Clean and Create Fresh Project Structure
       run: |
-        # إنشاء مشروع أندرويد مستقل وخالٍ من التعارضات
+        # حذف أي بقايا قديمة وإنشاء مشروع أندرويد نظيف وخالٍ من التعارضات تماماً
+        rm -rf solar_pump_app fadi_solar_app
         flutter create --org com.fadisayegh --platforms=android fadi_solar_app
         cd fadi_solar_app
         
-        # حقن كود الحسابات الهندسي الخاص بالمهندس فادي
+        # حقن كود الحسابات الهندسي النظيف الخاص بك داخل المشروع الجديد
         cat ../main.dart > lib/main.dart
         
-        # بناء التطبيق بأمر التجميع السريع والمباشر
-        flutter build apk --release --no-pub --split-per-abi
+        # إصلاح ملف settings.gradle ليتوافق هندسياً مع القيود المفروضة في السيرفرات ويمنع التعارض كلياً
+        cat << 'EOF' > android/settings.gradle
+        include ':app'
+        def localPropertiesFile = new File(rootProject.projectDir, "local.properties")
+        def localProperties = new Properties()
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.withReader('UTF-8') { reader -> localProperties.load(reader) }
+        }
+        def flutterSdkPath = localProperties.getProperty('flutter.sdk')
+        if (flutterSdkPath == null) {
+            throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+        }
+        includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
+        EOF
+
+        # بناء التطبيق بأمر التجميع الرسمي والسريع
+        flutter build apk --release --split-per-abi
 
     - name: Upload APK Artifacts
       uses: actions/upload-artifact@v3
