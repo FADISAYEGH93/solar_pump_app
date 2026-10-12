@@ -24,20 +24,31 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Setup Mock Images Locally
+    - name: Auto Create Clean Project Structure
       run: |
+        # إنشاء مشروع فلاتر نظيف وجديد كلياً في ثوانٍ
+        flutter create --org com.fadisayegh --platforms=android solar_pump_app
+        cd solar_pump_app
+        
+        # صناعة المجلدات الافتراضية للصور
         mkdir -p assets/images
         echo "Mock Image" > assets/images/icon.png
         echo "Mock Splash" > assets/images/splash.png
-        flutter clean
+        
+        # قراءة الأكواد النظيفة التي رفعها المهندس فادي واستبدالها في المشروع الجديد
+        cat ../main.dart > lib/main.dart
+        cat ../pubspec.yaml > pubspec.yaml
+        
+        # تحديث الحزم البرمجية محلياً في السيرفر
         flutter pub get
 
     - name: Build Android APK
       run: |
+        cd solar_pump_app
         flutter build apk --release --split-per-abi
 
     - name: Upload APK Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: release-apk
-        path: build/app/outputs/flutter-apk/*.apk
+        path: solar_pump_app/build/app/outputs/flutter-apk/*.apk
