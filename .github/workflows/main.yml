@@ -24,20 +24,29 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Extract Project Files
+    - name: Extract ZIP File Safely
       run: |
-        unzip "Solar pump app.zip" -d extracted_project
-        cd extracted_project/solar_pump_app
+        mkdir extracted_project
+        unzip "*.zip" -d extracted_project
+        
+        # البحث التلقائي عن المجلد الذي يحتوي على ملف pubspec.yaml والدخول إليه
+        TARGET_DIR=$(find extracted_project -name "pubspec.yaml" -exec dirname {} \;)
+        echo "Target directory is: $TARGET_DIR"
+        echo "TARGET_PATH=$TARGET_DIR" >> $GITHUB_ENV
+
+    - name: Get Flutter Dependencies
+      run: |
+        cd ${{ env.TARGET_PATH }}
         flutter clean
         flutter pub get
 
     - name: Build Android APK
       run: |
-        cd extracted_project/solar_pump_app
+        cd ${{ env.TARGET_PATH }}
         flutter build apk --release --split-per-abi
 
     - name: Upload APK Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: release-apk
-        path: extracted_project/solar_pump_app/build/app/outputs/flutter-apk/*.apk
+        path: ${{ env.TARGET_PATH }}/build/app/outputs/flutter-apk/*.apk
