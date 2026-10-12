@@ -24,58 +24,20 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Auto Create Clean Project Structure
+    - name: Automatic Application Assembly
       run: |
-        # إنشاء مشروع فلاتر نظيف
-        flutter create --org com.fadisayegh --platforms=android solar_pump_app
-        cd solar_pump_app
+        # إنشاء مشروع أندرويد مستقل وخالٍ من التعارضات
+        flutter create --org com.fadisayegh --platforms=android fadi_solar_app
+        cd fadi_solar_app
         
-        # صناعة مجلد الصور وتوليد صور افتراضية لمنع أي نقص
-        mkdir -p assets/images
-        echo "Mock Image" > assets/images/icon.png
-        echo "Mock Splash" > assets/images/splash.png
-        
-        # استبدال كود الـ main.dart بكود المهندس فادي النظيف
+        # حقن كود الحسابات الهندسي الخاص بالمهندس فادي
         cat ../main.dart > lib/main.dart
         
-        # كتابة ملف pubspec.yaml المصحح والمثالي تلقائياً داخل السيرفر
-        cat << 'EOF' > pubspec.yaml
-        name: solar_pump_app
-        description: "برنامج الحسابات الهندسية للمضخات والنظام التفاعلي المؤتمت"
-        publish_to: 'none'
-        version: 1.0.0+1
-        environment:
-          sdk: '>=3.0.0 <4.0.0'
-        dependencies:
-          flutter:
-            sdk: flutter
-          cupertino_icons: ^1.0.8
-          url_launcher: ^6.3.0
-        dev_dependencies:
-          flutter_test:
-            sdk: flutter
-          flutter_lints: ^3.0.0
-          flutter_launcher_icons: ^0.13.1
-        flutter_launcher_icons:
-          android: "launcher_icon"
-          ios: true
-          image_path: "assets/images/icon.png"
-        flutter:
-          uses-material-design: true
-          assets:
-            - assets/images/
-        EOF
-        
-        # تحديث الحزم البرمجية
-        flutter pub get
-
-    - name: Build Android APK
-      run: |
-        cd solar_pump_app
-        flutter build apk --release --split-per-abi
+        # بناء التطبيق بأمر التجميع السريع والمباشر
+        flutter build apk --release --no-pub --split-per-abi
 
     - name: Upload APK Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: release-apk
-        path: solar_pump_app/build/app/outputs/flutter-apk/*.apk
+        path: fadi_solar_app/build/app/outputs/flutter-apk/*.apk
