@@ -26,20 +26,47 @@ jobs:
 
     - name: Auto Create Clean Project Structure
       run: |
-        # إنشاء مشروع فلاتر نظيف وجديد كلياً في ثوانٍ
+        # إنشاء مشروع فلاتر نظيف
         flutter create --org com.fadisayegh --platforms=android solar_pump_app
         cd solar_pump_app
         
-        # صناعة المجلدات الافتراضية للصور
+        # صناعة مجلد الصور وتوليد صور افتراضية لمنع أي نقص
         mkdir -p assets/images
         echo "Mock Image" > assets/images/icon.png
         echo "Mock Splash" > assets/images/splash.png
         
-        # قراءة الأكواد النظيفة التي رفعها المهندس فادي واستبدالها في المشروع الجديد
+        # استبدال كود الـ main.dart بكود المهندس فادي النظيف
         cat ../main.dart > lib/main.dart
-        cat ../pubspec.yaml > pubspec.yaml
         
-        # تحديث الحزم البرمجية محلياً في السيرفر
+        # كتابة ملف pubspec.yaml المصحح والمثالي تلقائياً داخل السيرفر
+        cat << 'EOF' > pubspec.yaml
+        name: solar_pump_app
+        description: "برنامج الحسابات الهندسية للمضخات والنظام التفاعلي المؤتمت"
+        publish_to: 'none'
+        version: 1.0.0+1
+        environment:
+          sdk: '>=3.0.0 <4.0.0'
+        dependencies:
+          flutter:
+            sdk: flutter
+          cupertino_icons: ^1.0.8
+          url_launcher: ^6.3.0
+        dev_dependencies:
+          flutter_test:
+            sdk: flutter
+          flutter_lints: ^3.0.0
+          flutter_launcher_icons: ^0.13.1
+        flutter_launcher_icons:
+          android: "launcher_icon"
+          ios: true
+          image_path: "assets/images/icon.png"
+        flutter:
+          uses-material-design: true
+          assets:
+            - assets/images/
+        EOF
+        
+        # تحديث الحزم البرمجية
         flutter pub get
 
     - name: Build Android APK
