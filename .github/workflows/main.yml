@@ -24,11 +24,18 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Setup Project Structure
+    - name: Setup Project Structure & Mock Images
       run: |
         mkdir -p solar_pump_app/lib
+        mkdir -p solar_pump_app/assets/images
+        
+        # توليد صور افتراضية داخل السيرفر لمنع أخطاء النقص أثناء بناء الأيقونة
+        echo "Mock Image" > solar_pump_app/assets/images/icon.png
+        echo "Mock Splash" > solar_pump_app/assets/images/splash.png
+        
         mv main.dart solar_pump_app/lib/
         mv pubspec.yaml solar_pump_app/
+        
         cd solar_pump_app
         flutter clean
         flutter pub get
