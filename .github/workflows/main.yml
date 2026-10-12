@@ -24,29 +24,20 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Setup Project Structure & Mock Images
+    - name: Setup Mock Images Locally
       run: |
-        mkdir -p solar_pump_app/lib
-        mkdir -p solar_pump_app/assets/images
-        
-        # توليد صور افتراضية داخل السيرفر لمنع أخطاء النقص أثناء بناء الأيقونة
-        echo "Mock Image" > solar_pump_app/assets/images/icon.png
-        echo "Mock Splash" > solar_pump_app/assets/images/splash.png
-        
-        mv main.dart solar_pump_app/lib/
-        mv pubspec.yaml solar_pump_app/
-        
-        cd solar_pump_app
+        mkdir -p assets/images
+        echo "Mock Image" > assets/images/icon.png
+        echo "Mock Splash" > assets/images/splash.png
         flutter clean
         flutter pub get
 
     - name: Build Android APK
       run: |
-        cd solar_pump_app
         flutter build apk --release --split-per-abi
 
     - name: Upload APK Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: release-apk
-        path: solar_pump_app/build/app/outputs/flutter-apk/*.apk
+        path: build/app/outputs/flutter-apk/*.apk
